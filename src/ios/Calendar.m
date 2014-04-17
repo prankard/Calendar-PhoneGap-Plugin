@@ -7,10 +7,12 @@
 
 @implementation Calendar
 @synthesize eventStore;
+@synthesize accessGranted;
 
 #pragma mark Initialisation functions
 
 - (CDVPlugin*) initWithWebView:(UIWebView*)theWebView {
+    accessGranted = NO;
     self = (Calendar*)[super initWithWebView:theWebView];
     if (self) {
         [self initEventStoreWithCalendarCapabilities];
@@ -19,8 +21,9 @@
 }
 
 - (void)initEventStoreWithCalendarCapabilities {
-    __block BOOL accessGranted = NO;
-    eventStore= [[EKEventStore alloc] init];
+    if (eventStore == nil)
+        eventStore= [[EKEventStore alloc] init];
+    
     if([eventStore respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
         [eventStore requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
@@ -35,6 +38,11 @@
     if (accessGranted) {
         self.eventStore = eventStore;
     }
+}
+
+- (bool)isAvailable:(CDVInvokedUrlCommand*)command
+{
+    return accessGranted;
 }
 
 #pragma mark Helper Functions
