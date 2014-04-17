@@ -28,6 +28,7 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_FIND_EVENT = "findEvent";
   public static final String ACTION_LIST_EVENTS_IN_RANGE = "listEventsInRange";
   public static final String ACTION_LIST_CALENDARS = "listCalendars";
+  public static final String IS_AVAILABLE = "isAvailable";
 
   public static final Integer RESULT_CODE_CREATE = 0;
 
@@ -57,6 +58,9 @@ public class Calendar extends CordovaPlugin {
       return deleteEvent(args);
     } else if (!hasLimitedSupport && ACTION_LIST_CALENDARS.equals(action)) {
       return listCalendars();
+    } else if (IS_AVAILABLE.equals(action)) {
+    	callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
+    	return true;
     }
     return false;
   }
