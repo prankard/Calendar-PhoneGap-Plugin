@@ -6,7 +6,7 @@
 @interface Calendar : CDVPlugin
 
 @property (nonatomic, retain) EKEventStore* eventStore;
-@property (nonatomic) bool* accessGranted;
+@property (nonatomic) BOOL accessGranted;
 
 - (void)initEventStoreWithCalendarCapabilities;
 
@@ -17,7 +17,7 @@
                          endDate: (NSDate *)endDate
                         calendar: (EKCalendar *) calendar;
 
-- (bool)isAvailable:(CDVInvokedUrlCommand*)command;
+- (void)initCalendar:(CDVInvokedUrlCommand*)command;
 
 - (void)createCalendar:(CDVInvokedUrlCommand*)command;
 - (void)deleteCalendar:(CDVInvokedUrlCommand*)command;

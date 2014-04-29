@@ -11,16 +11,14 @@
 
 #pragma mark Initialisation functions
 
-- (CDVPlugin*) initWithWebView:(UIWebView*)theWebView {
+- (CDVPlugin*)initWithWebView:(UIWebView*)theWebView {
     accessGranted = NO;
     self = (Calendar*)[super initWithWebView:theWebView];
-    if (self) {
-        [self initEventStoreWithCalendarCapabilities];
-    }
     return self;
 }
 
-- (void)initEventStoreWithCalendarCapabilities {
+- (void)initCalendar:(CDVInvokedUrlCommand*)command
+{
     if (eventStore == nil)
         eventStore= [[EKEventStore alloc] init];
     
@@ -35,14 +33,18 @@
         accessGranted = YES;
     }
     
+    NSString *callbackId = command.callbackId;
     if (accessGranted) {
         self.eventStore = eventStore;
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
     }
-}
-
-- (bool)isAvailable:(CDVInvokedUrlCommand*)command
-{
-    return accessGranted;
+    else
+    {
+        CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Invalid Calendar Permissions"];
+        [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
+    }
+    
 }
 
 #pragma mark Helper Functions
@@ -106,7 +108,7 @@
     NSString* notes      = [options objectForKey:@"notes"];
     NSNumber* startTime  = [options objectForKey:@"startTime"];
     NSNumber* endTime    = [options objectForKey:@"endTime"];
-
+    
     NSDictionary* calOptions = [options objectForKey:@"options"];
     NSNumber* firstReminderMinutes = [calOptions objectForKey:@"firstReminderMinutes"];
     
