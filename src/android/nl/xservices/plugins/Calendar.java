@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.util.Date;
 
 public class Calendar extends CordovaPlugin {
+  public static final String ACTION_INIT_CALENDAR = "initCalendar";
   public static final String ACTION_CREATE_EVENT = "createEvent";
   public static final String ACTION_CREATE_EVENT_WITH_OPTIONS = "createEventWithOptions";
   public static final String ACTION_CREATE_EVENT_INTERACTIVELY = "createEventInteractively";
@@ -28,7 +29,6 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_FIND_EVENT = "findEvent";
   public static final String ACTION_LIST_EVENTS_IN_RANGE = "listEventsInRange";
   public static final String ACTION_LIST_CALENDARS = "listCalendars";
-  public static final String IS_AVAILABLE = "isAvailable";
 
   public static final Integer RESULT_CODE_CREATE = 0;
 
@@ -41,7 +41,10 @@ public class Calendar extends CordovaPlugin {
     callback = callbackContext;
     // TODO this plugin may work fine on 3.0 devices, but have not tested it yet, so to be sure:
     final boolean hasLimitedSupport = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-    if (ACTION_CREATE_EVENT.equals(action) || ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
+    
+    if (ACTION_INIT_CALENDAR.equals(action)) {
+    	return initCalendar();
+    } else if (ACTION_CREATE_EVENT.equals(action) || ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
       if (hasLimitedSupport) {
         // TODO investigate this option some day: http://stackoverflow.com/questions/3721963/how-to-add-calendar-events-in-android
         return createEventInteractively(args);
@@ -58,20 +61,23 @@ public class Calendar extends CordovaPlugin {
       return deleteEvent(args);
     } else if (!hasLimitedSupport && ACTION_LIST_CALENDARS.equals(action)) {
       return listCalendars();
-    } else if (IS_AVAILABLE.equals(action)) {
-    	callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
-    	return true;
     }
+    
     return false;
   }
 
+  private boolean initCalendar() {
+	  callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
+	  return true;
+  }
+  
   private boolean listCalendars() throws JSONException {
     final JSONArray jsonObject = getCalendarAccessor().getActiveCalendars();
     PluginResult res = new PluginResult(PluginResult.Status.OK, jsonObject);
     callback.sendPluginResult(res);
     return true;
   }
-
+  
   private boolean createEventInteractively(JSONArray args) throws JSONException {
     final JSONObject jsonFilter = args.getJSONObject(0);
 

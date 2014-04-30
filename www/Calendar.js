@@ -2,6 +2,10 @@
 function Calendar() {
 }
 
+Calendar.prototype.initCalendar = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "initCalendar", []);
+};
+
 Calendar.prototype.createCalendar = function (calendarName, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "createCalendar", [{
     "calendarName": calendarName
